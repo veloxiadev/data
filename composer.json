@@ -1,0 +1,53 @@
+{
+    "name": "veloxia/data",
+    "description": "The best Veloxiadata.",
+    "keywords": [
+        "veloxia",
+        "data"
+    ],
+    "homepage": "https://github.com/veloxia/data",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Viktor Svensson",
+            "email": "viktor@veloxia.se",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Veloxia\\Data\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Veloxia\\Data\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Veloxia\\Data\\DataServiceProvider"
+            ],
+            "aliases": {
+                "VD": "Veloxia\\Data\\DataFacade"
+            }
+        }
+    }
+}
