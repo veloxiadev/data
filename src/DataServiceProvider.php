@@ -11,10 +11,8 @@ class DataServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        /*
-         * Optional methods to load your package assets
-         */
-        // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'data');
+
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'data');
         // $this->loadViewsFrom(__DIR__.'/../resources/views', 'data');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
@@ -40,7 +38,9 @@ class DataServiceProvider extends ServiceProvider
             ], 'lang');*/
 
             // Registering package commands.
-            // $this->commands([]);
+            $this->commands([
+                \Veloxia\Data\Commands\DataMakeCommand::class,
+            ]);
         }
     }
 
@@ -54,7 +54,7 @@ class DataServiceProvider extends ServiceProvider
 
         // Register the main class to use with the facade
         $this->app->singleton('data', function () {
-            return new Data;
+            return new \Veloxia\Data\Data(config('data.token'));
         });
     }
 }

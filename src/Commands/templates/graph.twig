@@ -1,0 +1,22 @@
+<?php
+
+namespace {{ namespace|raw }};
+
+use Closure;
+use Veloxia\Data\Graph\Graph;
+
+class {{ name }} extends Graph
+{
+{% for method in methods %}
+
+    /**
+{% for annotation in method.annotations %}
+     * {{ annotation|raw }}
+{% endfor %}
+     */
+    public function {{method.name}}() 
+    {
+        //
+    }
+{% endfor %}
+}

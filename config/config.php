@@ -11,6 +11,6 @@ return [
     |
     */
 
-    'token'     => env('VD_API_TOKEN', ''),
+    'token'     => env('VD_API_TOKEN'),
 
 ];

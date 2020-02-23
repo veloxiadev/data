@@ -3,7 +3,8 @@
     "description": "The best Veloxiadata.",
     "keywords": [
         "veloxia",
-        "data"
+        "data",
+        "vd"
     ],
     "homepage": "https://github.com/veloxia/data",
     "license": "MIT",
@@ -17,7 +18,8 @@
     ],
     "require": {
         "php": "^7.1",
-        "illuminate/support": "^6.0"
+        "illuminate/support": "^6.0",
+        "twig/twig": "^3.0"
     },
     "require-dev": {
         "orchestra/testbench": "^4.0",

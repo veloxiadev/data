@@ -16,6 +16,6 @@ class DataFacade extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'data';
+        return static::$app['data'];
     }
 }
