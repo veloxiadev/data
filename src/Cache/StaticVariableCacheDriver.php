@@ -17,7 +17,7 @@ class StaticVariableCacheDriver extends DataCache implements CacheContract
      *
      * @var array
      */
-    protected static array $data = [];
+    protected static array $data = array();
 
     /**
      * Put data in cache.

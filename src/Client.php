@@ -155,7 +155,7 @@ class Client
     {
 
         $output = null;
-        foreach (config('data.cache_methods') as $method) {
+        foreach (self::getConfig('cache_methods') as $method) {
             $data = $method::get($graph);
             $output = $data !== null ? $data : $output;
         }
@@ -164,7 +164,7 @@ class Client
 
     protected static function setInCache($graph, $data)
     {
-        foreach (config('data.cache_methods') as $method) {
+        foreach (self::getConfig('cache_methods') as $method) {
             $method::put($graph, $data);
         }
     }
