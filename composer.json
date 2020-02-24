@@ -22,7 +22,7 @@
     },
     "require-dev": {
         "orchestra/testbench": "*",
-        "phpunit/phpunit": "^8.0",
+        "phpunit/phpunit": "^8.0|^7.0",
         "twig/twig": "^3.0|^2.0"
     },
     "autoload": {
