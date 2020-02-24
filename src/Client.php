@@ -120,7 +120,8 @@ class Client
     {
         $query[] = 'token=' . static::getConfig('token');
         $queryString = implode('&', $query);
-        $endpoint = "${static::getConfig('endpoint')}/${graph}/${method}?${queryString}";
+        $endpoint = static::getConfig('endpoint');
+        $endpoint = "${endpoint}/${graph}/${method}?${queryString}";
         try {
             $response = file_get_contents($endpoint);
             $response = json_decode($response, true);
