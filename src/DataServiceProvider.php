@@ -31,10 +31,15 @@ class DataServiceProvider extends ServiceProvider
      */
     public function register()
     {
+
+        $app = $this->app;
+
         # Merge package config with published config.
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'data');
 
         # Register the main application class.
-        $this->app->singleton('data', Client::class);
+        $this->app->singleton('data', function () use ($app) {
+            return new Client($app['config']['data']);
+        });
     }
 }

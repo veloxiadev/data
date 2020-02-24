@@ -12,9 +12,19 @@ class Client
     protected static $graph = [];
     protected static $config;
 
-    public function __construct()
+    public function __construct($config = [])
     {
-        self::$config = config('data');
+        self::$config = $config;
+    }
+
+    /**
+     * Get the current instance.
+     *
+     * @return  self 
+     */
+    public static function getInstance(): self
+    {
+        return new static;
     }
 
     /**
@@ -118,6 +128,11 @@ class Client
      */
     private static function makeApiRequest($graph, $method, array $query = [])
     {
+
+        if (app()->environment() == 'testing') {
+            return self::makeDummyApiRequest();
+        }
+
         $query[] = 'token=' . static::getConfig('token');
         $queryString = implode('&', $query);
         $endpoint = static::getConfig('endpoint');
@@ -152,5 +167,23 @@ class Client
         foreach (config('data.cache_methods') as $method) {
             $method::put($graph, $data);
         }
+    }
+
+    protected static function makeDummyApiRequest()
+    {
+        return [
+            [
+                'slug' => 'bank-norwegian',
+                'name' => 'Testing here',
+                'interest_from' => 2.9,
+                'interest_to' => 29.9,
+            ],
+            [
+                'slug' => 'testing-more',
+                'name' => 'Testing here',
+                'interest_from' => 2.9,
+                'interest_to' => 29.9,
+            ],
+        ];
     }
 }

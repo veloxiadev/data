@@ -21,7 +21,7 @@
         "illuminate/support": "^5.2|^6.0"
     },
     "require-dev": {
-        "orchestra/testbench": "*",
+        "orchestra/testbench": "^4.0",
         "phpunit/phpunit": "^7.0|^8.0",
         "twig/twig": "^2.0|^3.0"
     },
