@@ -6,7 +6,7 @@
         "data",
         "vd"
     ],
-    "homepage": "https://github.com/veloxia/data",
+    "homepage": "https://github.com/veloxiadev/data",
     "license": "MIT",
     "type": "library",
     "authors": [
@@ -27,7 +27,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Veloxia\\Data\\": "src"
+            "Veloxia\\Data\\": "src",
+            "Veloxia\\Data\\Graph\\": "graph"
         }
     },
     "autoload-dev": {
@@ -48,7 +49,7 @@
                 "Veloxia\\Data\\DataServiceProvider"
             ],
             "aliases": {
-                "VD": "Veloxia\\Data\\DataFacade"
+                "VD": "Veloxia\\Data\\Facades\\VD"
             }
         }
     }

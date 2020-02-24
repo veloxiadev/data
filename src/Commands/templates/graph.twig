@@ -2,11 +2,16 @@
 
 namespace {{ namespace|raw }};
 
-use Closure;
 use Veloxia\Data\Graph\Graph;
 
 class {{ name }} extends Graph
 {
+    /**
+     * Graph accessor when making requests to the API. 
+     * 
+     * @var string
+     */
+    protected static $graphName = '{{graph|raw}}';
 {% for method in methods %}
 
     /**
@@ -16,7 +21,9 @@ class {{ name }} extends Graph
      */
     public function {{method.name}}() 
     {
-        //
+{% for row in method.logic %}
+        {{ row|raw }}
+{% endfor %}
     }
 {% endfor %}
 }

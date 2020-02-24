@@ -1,13 +1,10 @@
 <?php
 
-namespace Veloxia\Data;
+namespace Veloxia\Data\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
-/**
- * @see \Veloxia\Data\Skeleton\SkeletonClass
- */
-class DataFacade extends Facade
+class VD extends Facade
 {
     /**
      * Get the registered name of the component.

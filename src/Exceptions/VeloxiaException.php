@@ -4,7 +4,7 @@ namespace Veloxia\Data\Exceptions;
 
 use Exception;
 
-class APIRequestException extends Exception
+abstract class VeloxiaException extends Exception
 {
     //
 }

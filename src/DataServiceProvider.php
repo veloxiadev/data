@@ -3,6 +3,7 @@
 namespace Veloxia\Data;
 
 use Illuminate\Support\ServiceProvider;
+use Veloxia\Data\Client;
 
 class DataServiceProvider extends ServiceProvider
 {
@@ -11,35 +12,16 @@ class DataServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
-        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'data');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'data');
-        // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
-        // $this->loadRoutesFrom(__DIR__.'/routes.php');
-
         if ($this->app->runningInConsole()) {
+
+            # Publish config in the /config directory.
             $this->publishes([
                 __DIR__ . '/../config/config.php' => config_path('data.php'),
             ], 'config');
 
-            // Publishing the views.
-            /*$this->publishes([
-                __DIR__.'/../resources/views' => resource_path('views/vendor/data'),
-            ], 'views');*/
-
-            // Publishing assets.
-            /*$this->publishes([
-                __DIR__.'/../resources/assets' => public_path('vendor/data'),
-            ], 'assets');*/
-
-            // Publishing the translation files.
-            /*$this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/data'),
-            ], 'lang');*/
-
-            // Registering package commands.
+            # Register commands.
             $this->commands([
-                \Veloxia\Data\Commands\DataMakeCommand::class,
+                \Veloxia\Data\Commands\MakeGraphCommand::class,
             ]);
         }
     }
@@ -49,12 +31,10 @@ class DataServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Automatically apply the package configuration
+        # Merge package config with published config.
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'data');
 
-        // Register the main class to use with the facade
-        $this->app->singleton('data', function () {
-            return new \Veloxia\Data\Data(config('data.token'));
-        });
+        # Register the main application class.
+        $this->app->singleton('data', Client::class);
     }
 }
