@@ -45,6 +45,10 @@ abstract class DataCache
      */
     protected static function unserialize($serialized): ?array
     {
-        return $serialized === null ? null : unserialize($serialized);
+        try {
+            return $serialized === null ? [] : unserialize($serialized);
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 }

@@ -3,11 +3,12 @@
 namespace Veloxia\Data;
 
 use Exception;
-use Veloxia\Data\Exceptions\RequestException;
+use Veloxia\Data\Contracts\DataContract;
 use Veloxia\Data\Exceptions\APIException;
+use Veloxia\Data\Exceptions\RequestException;
 use Veloxia\Data\Exceptions\ItemNotFoundException;
 
-class Client
+class Client implements DataContract
 {
     protected static $graph = [];
     protected static $config;
@@ -151,6 +152,13 @@ class Client
         return $response['data'];
     }
 
+    /**
+     * Get cached graph model data.
+     *
+     * @param   string  $graph  The graph model name
+     *
+     * @return  array           
+     */
     protected static function getFromCache($graph)
     {
 
@@ -162,6 +170,14 @@ class Client
         return $output;
     }
 
+    /**
+     * Save graph model data using the configured cache methods.
+     *
+     * @param   string  $graph  The graph model name
+     * @param   array   $data   The data to save
+     *
+     * @return  void
+     */
     protected static function setInCache($graph, $data)
     {
         foreach (self::getConfig('cache_methods') as $method) {

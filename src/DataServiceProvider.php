@@ -2,8 +2,9 @@
 
 namespace Veloxia\Data;
 
-use Illuminate\Support\ServiceProvider;
 use Veloxia\Data\Client;
+use Illuminate\Support\ServiceProvider;
+use Veloxia\Data\Contracts\DataContract;
 
 class DataServiceProvider extends ServiceProvider
 {
@@ -41,5 +42,8 @@ class DataServiceProvider extends ServiceProvider
         $this->app->singleton('data', function () use ($app) {
             return new Client($app['config']['data']);
         });
+
+        # Register aliases
+        $this->app->alias('data', DataContract::class);
     }
 }

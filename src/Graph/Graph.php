@@ -6,6 +6,7 @@ use Veloxia\Data\Client;
 use Veloxia\Data\Types\Undefined;
 use Veloxia\Data\Types\GenericType;
 use Veloxia\Data\Contracts\GraphContract;
+use Veloxia\Data\Exceptions\UnknownAttributeException;
 
 abstract class Graph implements GraphContract
 {
@@ -92,8 +93,39 @@ abstract class Graph implements GraphContract
         );
     }
 
+    /**
+     * Convert this graph to JSON.
+     *
+     * @return  string
+     */
     public function __toString()
     {
         return $this->toJson();
+    }
+
+    /**
+     * Handle missed calls, i.e. attempts to get attributes that do not exist.
+     *
+     * @param   string  $method  
+     * @param   array   $arguments 
+     * 
+     * @return  void
+     * 
+     * @throws  \Veloxia\Data\Exceptions\UnknownAttributeException
+     */
+    public function __call($method, $arguments)
+    {
+        if (!method_exists($this, $method)) {
+
+            # Look for similar attribute names and suggest using those.
+            $similarityOverThreshold = array_filter(array_keys($this->attributes), function ($key) use ($method) {
+                similar_text($key, $method, $percent);
+                return $percent > 70;
+            });
+
+            # Present suggestions and throw exception.
+            $suggestion = count($similarityOverThreshold) > 0 ? " Similarily named attributes: " . implode(', ', $similarityOverThreshold) : "";
+            throw new UnknownAttributeException("\"${method}\" is not a valid attribute.${suggestion}");
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Veloxia\Data\Types;
 
-class IntegerNumber extends Type
+class NumericInteger extends Type
 {
     //
 }
