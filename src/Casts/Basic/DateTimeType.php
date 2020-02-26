@@ -8,9 +8,15 @@ use Veloxia\Data\Contracts\TypeContract;
 
 class DateTimeType extends Type implements TypeContract
 {
-    public function format($input): Carbon
+    /**
+     * @param mixed $input
+     * @return \Carbon\Carbon|null
+     */
+    public function format($input): ?Carbon
     {
-        return new Carbon($input);
+        return $input === null
+            ? null
+            : new Carbon($input);
     }
 
     public function get()
