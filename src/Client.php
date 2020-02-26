@@ -116,8 +116,13 @@ class Client
      * @return  array           
      * @throws  \Veloxia\Data\Exceptions\APIRequestException
      */
-    public static function makeApiRequest($graph, $method, array $query = [])
+    private static function makeApiRequest($graph, $method, array $query = [])
     {
+
+        if (app()->environment() == 'testing') {
+            return self::makeDummyApiRequest();
+        }
+
         $query[] = 'token=' . static::getConfig('token');
         $queryString = implode('&', $query);
         $endpoint = static::getConfig('endpoint');
@@ -130,7 +135,7 @@ class Client
         }
 
         if ($response['success'] !== true) {
-            throw new APIException('API returned an error: ' . $response['message']);
+            throw new APIException('Could not make API request. Message: ' . $response['message']);
         }
 
         return $response['data'];
@@ -140,7 +145,7 @@ class Client
     {
 
         $output = null;
-        foreach (config('data.cache_methods') as $method) {
+        foreach (self::getConfig('cache_methods') as $method) {
             $data = $method::get($graph);
             $output = $data !== null ? $data : $output;
         }
@@ -149,8 +154,26 @@ class Client
 
     protected static function setInCache($graph, $data)
     {
-        foreach (config('data.cache_methods') as $method) {
+        foreach (self::getConfig('cache_methods') as $method) {
             $method::put($graph, $data);
         }
+    }
+
+    protected static function makeDummyApiRequest()
+    {
+        return [
+            [
+                'slug' => 'bank-norwegian',
+                'name' => 'Testing here',
+                'interest_from' => 2.9,
+                'interest_to' => 29.9,
+            ],
+            [
+                'slug' => 'testing-more',
+                'name' => 'Testing here',
+                'interest_from' => 2.9,
+                'interest_to' => 29.9,
+            ],
+        ];
     }
 }
