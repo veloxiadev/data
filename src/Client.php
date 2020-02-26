@@ -3,29 +3,18 @@
 namespace Veloxia\Data;
 
 use Exception;
-use Veloxia\Data\Contracts\DataContract;
-use Veloxia\Data\Exceptions\APIException;
 use Veloxia\Data\Exceptions\RequestException;
+use Veloxia\Data\Exceptions\APIException;
 use Veloxia\Data\Exceptions\ItemNotFoundException;
 
-class Client implements DataContract
+class Client
 {
     protected static $graph = [];
     protected static $config;
 
-    public function __construct($config = [])
+    public function __construct()
     {
-        self::$config = $config;
-    }
-
-    /**
-     * Get the current instance.
-     *
-     * @return  self 
-     */
-    public static function getInstance(): self
-    {
-        return new static;
+        self::$config = config('data');
     }
 
     /**
@@ -127,13 +116,8 @@ class Client implements DataContract
      * @return  array           
      * @throws  \Veloxia\Data\Exceptions\APIRequestException
      */
-    private static function makeApiRequest($graph, $method, array $query = [])
+    public static function makeApiRequest($graph, $method, array $query = [])
     {
-
-        if (app()->environment() == 'testing') {
-            return self::makeDummyApiRequest();
-        }
-
         $query[] = 'token=' . static::getConfig('token');
         $queryString = implode('&', $query);
         $endpoint = static::getConfig('endpoint');
@@ -146,60 +130,27 @@ class Client implements DataContract
         }
 
         if ($response['success'] !== true) {
-            throw new APIException('Could not make API request. Message: ' . $response['message']);
+            throw new APIException('API returned an error: ' . $response['message']);
         }
 
         return $response['data'];
     }
 
-    /**
-     * Get cached graph model data.
-     *
-     * @param   string  $graph  The graph model name
-     *
-     * @return  array           
-     */
     protected static function getFromCache($graph)
     {
 
         $output = null;
-        foreach (self::getConfig('cache_methods') as $method) {
+        foreach (config('data.cache_methods') as $method) {
             $data = $method::get($graph);
             $output = $data !== null ? $data : $output;
         }
         return $output;
     }
 
-    /**
-     * Save graph model data using the configured cache methods.
-     *
-     * @param   string  $graph  The graph model name
-     * @param   array   $data   The data to save
-     *
-     * @return  void
-     */
     protected static function setInCache($graph, $data)
     {
-        foreach (self::getConfig('cache_methods') as $method) {
+        foreach (config('data.cache_methods') as $method) {
             $method::put($graph, $data);
         }
-    }
-
-    protected static function makeDummyApiRequest()
-    {
-        return [
-            [
-                'slug' => 'bank-norwegian',
-                'name' => 'Testing here',
-                'interest_from' => 2.9,
-                'interest_to' => 29.9,
-            ],
-            [
-                'slug' => 'testing-more',
-                'name' => 'Testing here',
-                'interest_from' => 2.9,
-                'interest_to' => 29.9,
-            ],
-        ];
     }
 }

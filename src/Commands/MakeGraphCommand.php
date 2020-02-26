@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 use Veloxia\Data\Exceptions\DependencyException;
+use Illuminate\Support\Facades\Storage;
 
 class MakeGraphCommand extends Command
 {
@@ -45,8 +46,8 @@ class MakeGraphCommand extends Command
         $graph = $this->argument('graph');
         $className = ucfirst(substr($graph, 0, strlen($graph) - 1));
 
-        # Grab the first row and use for column information
-        $first = app('data')->fetch($graph)[0];
+        # Fetch schema from the API
+        $attributes = app('data')->makeApiRequest($graph, 'graph');
 
         # check if Twig environment is installed
         if (!class_exists(Environment::class)) {
@@ -54,34 +55,37 @@ class MakeGraphCommand extends Command
         }
         # check if Twig FS loader is installed
         if (!class_exists(FilesystemLoader::class)) {
-            throw new DependencyException(Environment::class . ' is required to execute this command.');
+            throw new DependencyException(FilesystemLoader::class . ' is required to execute this command.');
         }
 
+        # Instanciate Twig stuff.
         $fs = new FilesystemLoader(__DIR__ . '/templates/');
         $twig = new Environment($fs);
 
         $directory = __DIR__ . '/../../graph';
         $targetPath = $directory . '/' . $className . '.php';
 
-        $methods = array_keys($first);
-        sort($methods);
+        ksort($attributes);
+
+        $classMap = [];
 
         # All attributes should have their own method in the output class.
-        $methods = array_map(function ($item) {
+        $methods = array_map(function ($item) use ($attributes, &$classMap) {
+            $cast = $this->mapSchemaType($attributes[$item]);
+            $classMap[] = "'${item}' => ['" . camel($item) . "', ${cast}::class],";
             return [
                 'annotations'  => [
-                    "Get the value of ${item}.",
+                    "Get the value of ${item} (" . $attributes[$item] . ").",
+                    "",
+                    "@return " . $cast,
                 ],
-                'name' => lcfirst(
-                    preg_replace_callback('/([^\_]+)_?/i', function ($match) {
-                        return ucfirst($match[1]);
-                    }, $item)
-                ),
+                'name' => camel($item),
+                'cast' => $cast,
                 'logic' => [
                     'return $this->get(\'' . $item . '\');',
                 ],
             ];
-        }, $methods);
+        }, array_keys($attributes));
 
         # Parse the .twig and get the PHP file
         $php = $twig->render('graph.twig', [
@@ -89,12 +93,44 @@ class MakeGraphCommand extends Command
             'name' => $className,
             'graph' => $graph,
             'methods' => $methods,
+            'classMap' => $classMap,
         ]);
 
         # Save file
         touch($targetPath);
         file_put_contents($targetPath, $php);
+        $this->info("\\Veloxia\\Data\\Graph\\" . $className . " has been saved.");
+    }
 
-        $this->info($className . ' was successfully saved.');
+    protected function mapSchemaType($type)
+    {
+
+        $cast = null;
+
+        switch ($type) {
+            case "float":
+                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\FloatType';
+                break;
+            case "integer":
+                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\IntegerType';
+                break;
+            case "datetime":
+                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\DateTimeType';
+                break;
+            case "date":
+                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\DateTimeType';
+                break;
+            case "text":
+                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\TextType';
+                break;
+            case "string":
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\StringType';
+                break;
+            case "boolean":
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\BooleanType';
+                break;
+        }
+
+        return "${cast}";
     }
 }

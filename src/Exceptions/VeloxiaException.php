@@ -2,9 +2,9 @@
 
 namespace Veloxia\Data\Exceptions;
 
-use RuntimeException;
+use Exception;
 
-abstract class VeloxiaException extends RuntimeException
+abstract class VeloxiaException extends Exception
 {
     //
 }

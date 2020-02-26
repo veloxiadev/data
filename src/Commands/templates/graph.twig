@@ -3,8 +3,9 @@
 namespace {{ namespace|raw }};
 
 use Veloxia\Data\Graph\Graph;
+use Veloxia\Data\Contracts\GraphContract;
 
-class {{ name }} extends Graph
+class {{ name }} extends Graph implements GraphContract
 {
     /**
      * Graph accessor when making requests to the API. 
@@ -19,11 +20,22 @@ class {{ name }} extends Graph
      * {{ annotation|raw }}
 {% endfor %}
      */
-    public function {{method.name}}() 
+    public function {{method.name}}()
     {
 {% for row in method.logic %}
         {{ row|raw }}
 {% endfor %}
     }
 {% endfor %}
+
+    /**
+     * Attribute map used internally by the package in order to do map the accessor methods to the VD graph. Do not make any changes!
+     *
+     * @var array
+     */
+    protected static $graphAttributeMap = [
+{% for row in classMap %}
+        {{ row|raw }}
+{% endfor %}
+    ];
 }

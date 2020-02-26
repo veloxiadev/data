@@ -2,9 +2,8 @@
 
 namespace Veloxia\Data;
 
-use Veloxia\Data\Client;
 use Illuminate\Support\ServiceProvider;
-use Veloxia\Data\Contracts\DataContract;
+use Veloxia\Data\Client;
 
 class DataServiceProvider extends ServiceProvider
 {
@@ -22,7 +21,7 @@ class DataServiceProvider extends ServiceProvider
 
             # Register commands.
             $this->commands([
-                \Veloxia\Data\Commands\MakeGraphCommand::class,
+                'vd.make.graph' => \Veloxia\Data\Commands\MakeGraphCommand::class,
             ]);
         }
     }
@@ -32,18 +31,10 @@ class DataServiceProvider extends ServiceProvider
      */
     public function register()
     {
-
-        $app = $this->app;
-
         # Merge package config with published config.
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'data');
 
         # Register the main application class.
-        $this->app->singleton('data', function () use ($app) {
-            return new Client($app['config']['data']);
-        });
-
-        # Register aliases
-        $this->app->alias('data', DataContract::class);
+        $this->app->singleton('data', Client::class);
     }
 }

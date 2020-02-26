@@ -6,11 +6,11 @@ abstract class DataCache
 {
 
     /**
-     * The number of seconds to cache API responses, whenever this is applicable.
+     * The number of seconds to cache API responses.
      *
      * @var int
      */
-    protected static $cacheSeconds = 86400;
+    public static int $cacheSeconds = 86400;
 
     /**
      * Create a cache tag to use when caching responses.
@@ -45,10 +45,6 @@ abstract class DataCache
      */
     protected static function unserialize($serialized): ?array
     {
-        try {
-            return $serialized === null ? [] : unserialize($serialized);
-        } catch (\Exception $e) {
-            return [];
-        }
+        return $serialized === null ? null : unserialize($serialized);
     }
 }

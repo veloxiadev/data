@@ -3,10 +3,8 @@
 namespace Veloxia\Data\Graph;
 
 use Veloxia\Data\Client;
-use Veloxia\Data\Types\Undefined;
-use Veloxia\Data\Types\GenericType;
 use Veloxia\Data\Contracts\GraphContract;
-use Veloxia\Data\Exceptions\UnknownAttributeException;
+use Veloxia\Data\Contracts\TypeContract;
 
 abstract class Graph implements GraphContract
 {
@@ -27,20 +25,25 @@ abstract class Graph implements GraphContract
      */
     public static function find(string $slug): GraphContract
     {
-        $data = Client::find(static::$graphName, $slug);
-        $obj = new static($data);
-        return $obj;
+
+        # Register this graph model as a singleton to avoid having multiple
+        # instances of the same class running. 
+        app()->singletonIf(static::$graphName . '.' . $slug, function () use ($slug) {
+            return new static(Client::find(static::$graphName, $slug));
+        });
+
+        return app(static::$graphName . '.' . $slug);
     }
 
     /**
-     * Create a new model.
+     * Create a new model instance.
      *
      * @param array $attributes
      */
     public function __construct(array $attributes = [])
     {
         foreach ($attributes as $key => $val) {
-            $this->attributes[$key] = $val !== null ? new GenericType($val) : new Undefined();
+            $this->attributes[$key] = new static::$graphAttributeMap[$key][1]($val);
         }
     }
 
@@ -49,7 +52,7 @@ abstract class Graph implements GraphContract
      *
      * @param string $attribute
      *
-     * @return void
+     * @return mixed
      */
     public function get(string $attribute)
     {
@@ -57,17 +60,60 @@ abstract class Graph implements GraphContract
     }
 
     /**
-     * Set the value of an attribute. This won't affect the API, only the data that is saved locally.
+     * Set the value of an attribute.
      *
      * @param string $attribute
-     * @param mixed $value
+     * @param \Veloxia\Data\Casts\TypeContract
+     *
+     * @return mixed
+     */
+    public function set(string $attribute, TypeContract $type)
+    {
+        return $this->attributes[$attribute] = $type;
+    }
+
+    /**
+     * Magic method to steer direct referencing to the correct "pseudo variable".
+     *
+     * @param   string  $attribute
+     *
+     * @return  mixed
+     */
+    public function __get(string $attribute)
+    {
+        if (!isset($this->$attribute)) {
+            return $this->attributes[$attribute]->get();
+        }
+    }
+
+    /**
+     * Turn this graph model into an array of serialized type objects.
+     *
+     * @return  array
+     */
+    public function export(): array
+    {
+        array_walk($this->attributes, function (&$item) {
+            $item = json_encode([get_class($item), $item->export()]);
+        });
+        return $this->attributes;
+    }
+
+    /**
+     * Import an array of attributes and turn it into a graph model.
+     *
+     * @param array   $values
      *
      * @return self
      */
-    public function set(string $attribute, $value)
+    public static function import(array $values): self
     {
-        $this->attributes[$attribute] = $value;
-        return $this;
+        $graph = new static();
+        foreach ($values as $attribute => $value) {
+            $value = json_decode($value);
+            $graph->set($attribute, $value[0]::import($value[1]));
+        }
+        return $graph;
     }
 
     /**
@@ -77,7 +123,9 @@ abstract class Graph implements GraphContract
      */
     public function toArray(): array
     {
-        return $this->attributes;
+        return array_map(function ($val) {
+            return $val->get();
+        }, $this->attributes);
     }
 
     /**
@@ -94,38 +142,12 @@ abstract class Graph implements GraphContract
     }
 
     /**
-     * Convert this graph to JSON.
+     * Convert the entire graph model to JSON.
      *
-     * @return  string
+     * @return  string  JSON
      */
     public function __toString()
     {
         return $this->toJson();
-    }
-
-    /**
-     * Handle missed calls, i.e. attempts to get attributes that do not exist.
-     *
-     * @param   string  $method  
-     * @param   array   $arguments 
-     * 
-     * @return  void
-     * 
-     * @throws  \Veloxia\Data\Exceptions\UnknownAttributeException
-     */
-    public function __call($method, $arguments)
-    {
-        if (!method_exists($this, $method)) {
-
-            # Look for similar attribute names and suggest using those.
-            $similarityOverThreshold = array_filter(array_keys($this->attributes), function ($key) use ($method) {
-                similar_text($key, $method, $percent);
-                return $percent > 70;
-            });
-
-            # Present suggestions and throw exception.
-            $suggestion = count($similarityOverThreshold) > 0 ? " Similarily named attributes: " . implode(', ', $similarityOverThreshold) : "";
-            throw new UnknownAttributeException("\"${method}\" is not a valid attribute.${suggestion}");
-        }
     }
 }
