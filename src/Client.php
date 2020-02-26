@@ -12,9 +12,9 @@ class Client
     protected static $graph = [];
     protected static $config;
 
-    public function __construct()
+    public function __construct(array $config)
     {
-        self::$config = config('data');
+        self::$config = $config;
     }
 
     /**
@@ -42,7 +42,9 @@ class Client
      */
     public static function __callStatic($method, $arguments)
     {
-        return self::find($method, ...$arguments);
+        if (!method_exists(self, $method)) {
+            return self::find($method, ...$arguments);
+        }
     }
 
     /**
@@ -55,7 +57,9 @@ class Client
      */
     public function __call($method, $arguments)
     {
-        return self::find($method, ...$arguments);
+        if (!method_exists($this, $method)) {
+            return self::find($method, ...$arguments);
+        }
     }
 
     /**
