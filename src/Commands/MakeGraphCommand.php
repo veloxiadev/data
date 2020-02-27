@@ -2,11 +2,12 @@
 
 namespace Veloxia\Data\Commands;
 
-use Illuminate\Console\Command;
 use Twig\Environment;
+use Veloxia\Data\Client;
+use Illuminate\Console\Command;
 use Twig\Loader\FilesystemLoader;
-use Veloxia\Data\Exceptions\DependencyException;
 use Illuminate\Support\Facades\Storage;
+use Veloxia\Data\Exceptions\DependencyException;
 
 class MakeGraphCommand extends Command
 {
@@ -47,7 +48,7 @@ class MakeGraphCommand extends Command
         $className = ucfirst(substr($graph, 0, strlen($graph) - 1));
 
         # Fetch schema from the API
-        $attributes = app('data')->makeApiRequest($graph, 'graph');
+        $attributes = Client::makeApiRequest($graph, 'graph');
 
         # check if Twig environment is installed
         if (!class_exists(Environment::class)) {

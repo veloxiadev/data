@@ -19,8 +19,15 @@ class DateTimeType extends Type implements TypeContract
             : new Carbon($input);
     }
 
-    public function get()
+    /**
+     * Flatten the Carbon object and return a string or null.
+     *
+     * @return void
+     */
+    public function get(): ?string
     {
-        return $this->value->__toString();
+        return $this->value instanceof Carbon
+            ? $this->value->__toString()
+            : null;
     }
 }

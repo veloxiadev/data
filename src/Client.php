@@ -24,27 +24,12 @@ class Client
      *
      * @return  mixed        
      */
-    protected static function getConfig(string $key)
+    protected function getConfig(string $key)
     {
         if (is_null(self::$config)) {
             self::$config = config('data');
         }
         return self::$config[$key];
-    }
-
-    /**
-     * Magic method to capture static calls and direct to the search function.
-     *
-     * @param   string  $method    
-     * @param   mixed  $arguments  
-     *
-     * @return  mixed               
-     */
-    public static function __callStatic($method, $arguments)
-    {
-        if (!method_exists(self, $method)) {
-            return self::find($method, ...$arguments);
-        }
     }
 
     /**
@@ -58,7 +43,7 @@ class Client
     public function __call($method, $arguments)
     {
         if (!method_exists($this, $method)) {
-            return self::find($method, ...$arguments);
+            return $this->find($method, ...$arguments);
         }
     }
 
@@ -70,11 +55,11 @@ class Client
      *
      * @return  array           
      */
-    public static function find(string $graph, string $slug): array
+    public function find(string $graph, string $slug): array
     {
 
         # First try to find a cached copy of the model.
-        $cachedItem = static::getFromCache($graph . '.' . $slug);
+        $cachedItem = $this->getFromCache($graph . '.' . $slug);
         if ($cachedItem) {
             return $cachedItem;
         }
@@ -82,29 +67,29 @@ class Client
         # If that fails, all models from the API and look
         # for the correct one. Also save the rest in cache
         # for later use.
-        $items = self::fetch($graph);
+        $items = $this->fetch($graph);
         if ($n = array_search($slug, array_column($items, 'slug'))) {
             $item = $items[$n];
-            static::setInCache($graph . '.' . $slug, $item);
+            $this->setInCache($graph . '.' . $slug, $item);
             return $item;
         }
 
         throw new ItemNotFoundException('Could not find ' . $slug);
     }
 
-    public static function fetch(string $graph)
+    public function fetch(string $graph)
     {
 
         # Look for data in cache.
         # If data was found in cache, return immediately.
-        $data = self::getFromCache($graph);
+        $data = $this->getFromCache($graph);
         if ($data) return $data;
 
         # Last option is to make an API request.
         # In this case, save the response.
-        $data = self::makeApiRequest($graph, 'get');
+        $data = $this->makeApiRequest($graph, 'get');
 
-        self::setInCache($graph, $data);
+        $this->setInCache($graph, $data);
 
         # Return the results
         return $data;
@@ -120,17 +105,18 @@ class Client
      * @return  array           
      * @throws  \Veloxia\Data\Exceptions\APIRequestException
      */
-    private static function makeApiRequest($graph, $method, array $query = [])
+    public function makeApiRequest($graph, $method, array $query = [])
     {
 
         if (app()->environment() == 'testing') {
-            return self::makeDummyApiRequest();
+            return $this->makeDummyApiRequest();
         }
 
-        $query[] = 'token=' . static::getConfig('token');
+        $query[] = 'token=' . $this->getConfig('token');
         $queryString = implode('&', $query);
-        $endpoint = static::getConfig('endpoint');
+        $endpoint = $this->getConfig('endpoint');
         $endpoint = "${endpoint}/${graph}/${method}?${queryString}";
+
         try {
             $response = file_get_contents($endpoint);
             $response = json_decode($response, true);
@@ -145,20 +131,20 @@ class Client
         return $response['data'];
     }
 
-    protected static function getFromCache($graph)
+    protected function getFromCache($graph)
     {
 
         $output = null;
-        foreach (self::getConfig('cache_methods') as $method) {
+        foreach ($this->getConfig('cache_methods') as $method) {
             $data = $method::get($graph);
             $output = $data !== null ? $data : $output;
         }
         return $output;
     }
 
-    protected static function setInCache($graph, $data)
+    protected function setInCache($graph, $data)
     {
-        foreach (self::getConfig('cache_methods') as $method) {
+        foreach ($this->getConfig('cache_methods') as $method) {
             $method::put($graph, $data);
         }
     }

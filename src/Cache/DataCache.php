@@ -6,11 +6,11 @@ abstract class DataCache
 {
 
     /**
-     * The number of seconds to cache API responses.
+     * The number of seconds to cache API responses
      *
      * @var int
      */
-    public static $cacheSeconds = 86400;
+    public int $cacheSeconds = 86400;
 
     /**
      * Create a cache tag to use when caching responses.

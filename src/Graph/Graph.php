@@ -28,8 +28,8 @@ abstract class Graph implements GraphContract
 
         # Register this graph model as a singleton to avoid having multiple
         # instances of the same class running. 
-        app()->singletonIf(static::$graphName . '.' . $slug, function () use ($slug) {
-            return new static(Client::find(static::$graphName, $slug));
+        app()->singleton(static::$graphName . '.' . $slug, function () use ($slug) {
+            return new static(app('data')->find(static::$graphName, $slug));
         });
 
         return app(static::$graphName . '.' . $slug);
@@ -124,7 +124,7 @@ abstract class Graph implements GraphContract
     public function toArray(): array
     {
         return array_map(function ($val) {
-            return $val->get();
+            return @$val->get() ?: null;
         }, $this->attributes);
     }
 

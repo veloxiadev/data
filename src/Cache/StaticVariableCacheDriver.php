@@ -41,8 +41,7 @@ class StaticVariableCacheDriver extends DataCache implements CacheContract
      */
     public static function get(string $graph): ?array
     {
-        if (!array_key_exists(parent::makeKey($graph), static::$data)) return null;
-        $data = static::$data[parent::makeKey($graph)];
-        return @parent::unserialize($data) ?: null;
+        $data = static::$data[parent::makeKey($graph)] ?? null;
+        return parent::unserialize($data) ?? null;
     }
 }
