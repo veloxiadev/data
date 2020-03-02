@@ -11,7 +11,7 @@ use Veloxia\Data\Contracts\TypeContract;
 class FloatType extends Type implements TypeContract
 {
 
-    protected ?float $value;
+    protected $value;
 
     public function format($input): float
     {

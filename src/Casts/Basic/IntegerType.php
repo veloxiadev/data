@@ -11,7 +11,7 @@ use Veloxia\Data\Contracts\TypeContract;
 class IntegerType extends Type implements TypeContract
 {
 
-    protected ?int $value;
+    protected $value;
 
     public function format($input): int
     {

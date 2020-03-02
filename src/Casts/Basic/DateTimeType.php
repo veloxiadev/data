@@ -9,7 +9,7 @@ use Veloxia\Data\Contracts\TypeContract;
 class DateTimeType extends Type implements TypeContract
 {
 
-    protected ?Carbon $value;
+    protected $value;
 
     /**
      * @param mixed $input
