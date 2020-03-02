@@ -10,6 +10,9 @@ use Veloxia\Data\Contracts\TypeContract;
  */
 class IntegerType extends Type implements TypeContract
 {
+
+    protected ?int $value;
+
     public function format($input): int
     {
         return (int) $input;

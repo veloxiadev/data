@@ -13,6 +13,6 @@ class VD extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return static::$app['data'];
+        return 'data';
     }
 }

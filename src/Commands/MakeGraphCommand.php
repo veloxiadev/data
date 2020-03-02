@@ -3,7 +3,7 @@
 namespace Veloxia\Data\Commands;
 
 use Twig\Environment;
-use Veloxia\Data\Client;
+use Veloxia\Data\Facades\VD;
 use Illuminate\Console\Command;
 use Twig\Loader\FilesystemLoader;
 use Illuminate\Support\Facades\Storage;
@@ -24,8 +24,6 @@ class MakeGraphCommand extends Command
      * @var string
      */
     protected $description = 'Download a VD Graph Model.';
-
-    private $templates;
 
     /**
      * Create a new command instance.
@@ -48,7 +46,7 @@ class MakeGraphCommand extends Command
         $className = ucfirst(substr($graph, 0, strlen($graph) - 1));
 
         # Fetch schema from the API
-        $attributes = Client::makeApiRequest($graph, 'graph');
+        $attributes = VD::makeApiRequest($graph, 'graph');
 
         # check if Twig environment is installed
         if (!class_exists(Environment::class)) {
@@ -71,6 +69,7 @@ class MakeGraphCommand extends Command
         $classMap = [];
 
         # All attributes should have their own method in the output class.
+        # This allows easy autocompletion etc. when developing.
         $methods = array_map(function ($item) use ($attributes, &$classMap) {
             $cast = $this->mapSchemaType($attributes[$item]);
             $classMap[] = "'${item}' => ['" . camel($item) . "', ${cast}::class],";
@@ -103,26 +102,33 @@ class MakeGraphCommand extends Command
         $this->info("\\Veloxia\\Data\\Graph\\" . $className . " has been saved.");
     }
 
-    protected function mapSchemaType($type)
+    /**
+     * Convert basic types (like `int` or `string`) into the proper local form.
+     *
+     * @param   string  $type
+     *
+     * @return  string
+     */
+    protected function mapSchemaType(string $type)
     {
 
         $cast = null;
 
         switch ($type) {
             case "float":
-                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\FloatType';
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\FloatType';
                 break;
             case "integer":
-                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\IntegerType';
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\IntegerType';
                 break;
             case "datetime":
-                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\DateTimeType';
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\DateTimeType';
                 break;
             case "date":
-                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\DateTimeType';
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\DateTimeType';
                 break;
             case "text":
-                $cast =  '\\Veloxia\\Data\\Casts\\Basic\\TextType';
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\TextType';
                 break;
             case "string":
                 $cast = '\\Veloxia\\Data\\Casts\\Basic\\StringType';

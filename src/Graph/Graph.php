@@ -26,8 +26,7 @@ abstract class Graph implements GraphContract
     public static function find(string $slug): GraphContract
     {
 
-        # Register this graph model as a singleton to avoid having multiple
-        # instances of the same class running. 
+        # Bind this graph model in the container. 
         app()->singleton(static::$graphName . '.' . $slug, function () use ($slug) {
             return new static(app('data')->find(static::$graphName, $slug));
         });

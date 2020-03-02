@@ -10,6 +10,9 @@ use Veloxia\Data\Contracts\TypeContract;
  */
 class BooleanType extends Type implements TypeContract
 {
+
+    protected ?bool $value;
+
     /**
      * If `$value == true`, this will return true. Otherwise false (not nullable). 
      *

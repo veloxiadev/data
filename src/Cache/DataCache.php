@@ -10,7 +10,7 @@ abstract class DataCache
      *
      * @var int
      */
-    public int $cacheSeconds = 86400;
+    public static $cacheSeconds = 86400;
 
     /**
      * Create a cache tag to use when caching responses.
@@ -45,6 +45,8 @@ abstract class DataCache
      */
     protected static function unserialize($serialized): ?array
     {
-        return $serialized === null ? null : unserialize($serialized);
+        return $serialized === null
+            ? null
+            : unserialize($serialized);
     }
 }

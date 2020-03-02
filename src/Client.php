@@ -26,9 +26,6 @@ class Client
      */
     protected function getConfig(string $key)
     {
-        if (is_null(self::$config)) {
-            self::$config = config('data');
-        }
         return self::$config[$key];
     }
 
@@ -55,7 +52,7 @@ class Client
      *
      * @return  array           
      */
-    public function find(string $graph, string $slug): array
+    public function find(string $graph, string $slug = null): array
     {
 
         # First try to find a cached copy of the model.
@@ -68,7 +65,8 @@ class Client
         # for the correct one. Also save the rest in cache
         # for later use.
         $items = $this->fetch($graph);
-        if ($n = array_search($slug, array_column($items, 'slug'))) {
+        if (in_array($slug, array_column($items, 'slug'))) {
+            $n = array_search($slug, array_column($items, 'slug'));
             $item = $items[$n];
             $this->setInCache($graph . '.' . $slug, $item);
             return $item;
@@ -108,14 +106,14 @@ class Client
     public function makeApiRequest($graph, $method, array $query = [])
     {
 
-        if (app()->environment() == 'testing') {
-            return $this->makeDummyApiRequest();
-        }
-
         $query[] = 'token=' . $this->getConfig('token');
         $queryString = implode('&', $query);
         $endpoint = $this->getConfig('endpoint');
-        $endpoint = "${endpoint}/${graph}/${method}?${queryString}";
+        $endpoint = __DIR__ . '/../' . $endpoint;
+        # endpoint is a url
+        if (!file_exists($endpoint)) {
+            $endpoint = "${endpoint}/${graph}/${method}?${queryString}";
+        }
 
         try {
             $response = file_get_contents($endpoint);
@@ -123,6 +121,7 @@ class Client
         } catch (\Exception $e) {
             throw new RequestException('Something went wrong when requesting the API endpoint.');
         }
+
 
         if ($response['success'] !== true) {
             throw new APIException('Could not make API request. Message: ' . $response['message']);

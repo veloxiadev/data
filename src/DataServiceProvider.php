@@ -16,7 +16,7 @@ class DataServiceProvider extends ServiceProvider
 
             # Publish config in the /config directory.
             $this->publishes([
-                __DIR__ . '/../config/config.php' => config_path('data.php'),
+                __DIR__ . '/../config/config.php' => config_path('veloxia-data.php'),
             ], 'config');
 
             # Register commands.
@@ -34,7 +34,7 @@ class DataServiceProvider extends ServiceProvider
         $app = $this->app;
 
         # Merge package config with published config.
-        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'data');
+        $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'veloxia-data');
 
         # Register the main application class.
         $app->singleton('data', function ($app) {
@@ -44,6 +44,6 @@ class DataServiceProvider extends ServiceProvider
 
     private function getConfig($app)
     {
-        return $app['config']->get('data');
+        return $app['config']->get('veloxia-data');
     }
 }

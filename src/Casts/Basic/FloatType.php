@@ -10,6 +10,9 @@ use Veloxia\Data\Contracts\TypeContract;
  */
 class FloatType extends Type implements TypeContract
 {
+
+    protected ?float $value;
+
     public function format($input): float
     {
         return (float) $input;

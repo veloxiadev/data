@@ -34,7 +34,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Veloxia\\Data\\Tests\\": "tests"
+            "Veloxia\\Data\\": "tests"
         }
     },
     "scripts": {

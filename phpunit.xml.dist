@@ -17,6 +17,10 @@
     <filter>
         <whitelist>
             <directory suffix=".php">src/</directory>
+            <directory suffix=".php">tests/lib/</directory>
         </whitelist>
     </filter>
+    <php>
+        <server name="VD_API_ENDPOINT" value="tests/lib/mobileplans.json"/>
+    </php>
 </phpunit>
