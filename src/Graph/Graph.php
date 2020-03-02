@@ -14,7 +14,7 @@ abstract class Graph implements GraphContract
      *
      * @var array
      */
-    protected array $attributes = [];
+    protected $attributes = [];
 
     /**
      * Find a model within this graph.
