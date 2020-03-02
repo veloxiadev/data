@@ -18,5 +18,5 @@ interface GraphContract
      *
      * @return GraphContract
      */
-    public static function import(array $values): self;
+    public static function import(array $values): GraphContract;
 }

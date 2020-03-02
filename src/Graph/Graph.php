@@ -103,9 +103,9 @@ abstract class Graph implements GraphContract
      *
      * @param array   $values
      *
-     * @return self
+     * @return \Veloxia\Data\Contracts\GraphContract
      */
-    public static function import(array $values): self
+    public static function import(array $values): GraphContract
     {
         $graph = new static();
         foreach ($values as $attribute => $value) {
