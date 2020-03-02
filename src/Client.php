@@ -75,13 +75,22 @@ class Client
         throw new ItemNotFoundException('Could not find ' . $slug);
     }
 
-    public function fetch(string $graph)
+    /**
+     * Fetch a graph.
+     *
+     * @param string $graph
+     *
+     * @return array
+     */
+    public function fetch(string $graph): array
     {
 
         # Look for data in cache.
         # If data was found in cache, return immediately.
         $data = $this->getFromCache($graph);
-        if ($data) return $data;
+        if (is_array($data)) {
+            return $data;
+        }
 
         # Last option is to make an API request.
         # In this case, save the response.
@@ -110,16 +119,22 @@ class Client
         $queryString = implode('&', $query);
         $endpoint = $this->getConfig('endpoint');
         $endpoint = __DIR__ . '/../' . $endpoint;
-        # endpoint is a url
+
+        # if endpoint does not exist as a file, assume it's a url
         if (!file_exists($endpoint)) {
             $endpoint = "${endpoint}/${graph}/${method}?${queryString}";
         }
 
         try {
             $response = file_get_contents($endpoint);
+        } catch (\Exception $e) {
+            throw new RequestException('Something went wrong when requesting the API endpoint', $e);
+        }
+
+        try {
             $response = json_decode($response, true);
         } catch (\Exception $e) {
-            throw new RequestException('Something went wrong when requesting the API endpoint.');
+            throw new APIException('The API returned invalid JSON.', $e);
         }
 
 

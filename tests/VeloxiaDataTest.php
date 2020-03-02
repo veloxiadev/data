@@ -34,6 +34,7 @@ class VeloxiaDataTest extends TestCase
         $this->assertSame($data->slug, 'halebop-2gb');
         $this->assertSame($data->price, 99.0);
         $this->assertSame($data->rating, 3.0);
+        $this->assertInstanceOf(GraphContract::class, $data);
     }
 
     public function test_if_exception_is_thrown_when_the_model_does_not_exist()
