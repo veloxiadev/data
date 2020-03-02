@@ -118,10 +118,10 @@ class Client
         $query[] = 'token=' . $this->getConfig('token');
         $queryString = implode('&', $query);
         $endpoint = $this->getConfig('endpoint');
-        $endpoint = __DIR__ . '/../' . $endpoint;
+        $endpointFile = __DIR__ . '/../' . $endpoint;
 
         # if endpoint does not exist as a file, assume it's a url
-        if (!file_exists($endpoint)) {
+        if (!file_exists($endpointFile)) {
             $endpoint = "${endpoint}/${graph}/${method}?${queryString}";
         }
 
