@@ -8,18 +8,6 @@ abstract class Type implements TypeContract
 {
 
     /**
-     * Import a serialized chunk of data and turn it into a "type".
-     *
-     * @param string $serialized
-     *
-     * @return self
-     */
-    public static function import(string $serialized): self
-    {
-        return new static(unserialize($serialized));
-    }
-
-    /**
      * Instanciate the type, optionally with data.
      *
      * @param   mixed   $value 
@@ -31,6 +19,18 @@ abstract class Type implements TypeContract
         $this->value = method_exists($this, 'format')
             ? $this->format($value)
             : $value;
+    }
+
+    /**
+     * Import a serialized chunk of data and turn it into a "type".
+     *
+     * @param string $serialized
+     *
+     * @return self
+     */
+    public static function import(string $serialized): TypeContract
+    {
+        return new static(unserialize($serialized));
     }
 
     /**
