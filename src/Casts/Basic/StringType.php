@@ -11,7 +11,7 @@ use Veloxia\Data\Contracts\TypeContract;
 class StringType extends Type implements TypeContract
 {
 
-    protected ?string $value;
+    protected $value;
 
     public function format($input): string
     {
