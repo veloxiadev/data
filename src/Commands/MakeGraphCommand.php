@@ -116,28 +116,28 @@ class MakeGraphCommand extends Command
 
         switch ($type) {
             case "float":
-                $cast = \Veloxia\Data\Casts\Basic\FloatType::class;
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\FloatType';
                 break;
             case "integer":
-                $cast = \Veloxia\Data\Casts\Basic\IntegerType::class;
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\IntegerType';
                 break;
             case "datetime":
-                $cast = \Veloxia\Data\Casts\Basic\DateTimeType::class;
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\DateTimeType';
                 break;
             case "date":
-                $cast = \Veloxia\Data\Casts\Basic\DateTimeType::class;
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\DateTimeType';
                 break;
             case "text":
-                $cast = \Veloxia\Data\Casts\Basic\TextType::class;
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\TextType';
                 break;
             case "string":
-                $cast = \Veloxia\Data\Casts\Basic\StringType::class;
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\StringType';
                 break;
             case "boolean":
-                $cast = \Veloxia\Data\Casts\Basic\BooleanType::class;
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\BooleanType';
                 break;
             default:
-                $cast = \Veloxia\Data\Casts\Basic\TextType::class;
+                $cast = '\\Veloxia\\Data\\Casts\\Basic\\TextType';
                 break;
         }
 
