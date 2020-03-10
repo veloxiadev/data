@@ -2,10 +2,9 @@
 
 namespace Veloxia\Data;
 
-use Exception;
-use Veloxia\Data\Exceptions\RequestException;
 use Veloxia\Data\Exceptions\APIException;
 use Veloxia\Data\Exceptions\ItemNotFoundException;
+use Veloxia\Data\Exceptions\RequestException;
 
 class Client
 {
@@ -20,9 +19,7 @@ class Client
     /**
      * Get a config parameter.
      *
-     * @param   string  $key 
-     *
-     * @return  mixed        
+     * @return mixed
      */
     protected function getConfig(string $key)
     {
@@ -32,10 +29,10 @@ class Client
     /**
      * Magic method to capture calls and direct to the search function.
      *
-     * @param   string  $method    
-     * @param   mixed   $arguments  
+     * @param string $method
+     * @param mixed  $arguments
      *
-     * @return  mixed               
+     * @return mixed
      */
     public function __call($method, $arguments)
     {
@@ -47,80 +44,73 @@ class Client
     /**
      * Look for a `graph` model with a specific `slug`.
      *
-     * @param   string  $graph  The graph to search in.
-     * @param   string  $slug   Slug URL.
-     *
-     * @return  array           
+     * @param string $graph the graph to search in
+     * @param string $slug  slug URL
      */
     public function find(string $graph, string $slug = null): array
     {
-
-        # First try to find a cached copy of the model.
-        $cachedItem = $this->getFromCache($graph . '.' . $slug);
+        // First try to find a cached copy of the model.
+        $cachedItem = $this->getFromCache($graph.'.'.$slug);
         if ($cachedItem) {
             return $cachedItem;
         }
 
-        # If that fails, all models from the API and look
-        # for the correct one. Also save the rest in cache
-        # for later use.
+        // If that fails, all models from the API and look
+        // for the correct one. Also save the rest in cache
+        // for later use.
         $items = $this->fetch($graph);
         if (in_array($slug, array_column($items, 'slug'))) {
             $n = array_search($slug, array_column($items, 'slug'));
             $item = $items[$n];
-            $this->setInCache($graph . '.' . $slug, $item);
+            $this->setInCache($graph.'.'.$slug, $item);
+
             return $item;
         }
 
-        throw new ItemNotFoundException('Could not find ' . $slug);
+        throw new ItemNotFoundException('Could not find '.$slug);
     }
 
     /**
      * Fetch a graph.
-     *
-     * @param string $graph
-     *
-     * @return array
      */
     public function fetch(string $graph): array
     {
-
-        # Look for data in cache.
-        # If data was found in cache, return immediately.
+        // Look for data in cache.
+        // If data was found in cache, return immediately.
         $data = $this->getFromCache($graph);
         if (is_array($data)) {
             return $data;
         }
 
-        # Last option is to make an API request.
-        # In this case, save the response.
+        // Last option is to make an API request.
+        // In this case, save the response.
         $data = $this->makeApiRequest($graph, 'get');
 
         $this->setInCache($graph, $data);
 
-        # Return the results
+        // Return the results
         return $data;
     }
 
     /**
      * Execute an API request.
      *
-     * @param   string $graph   e.g. loans/cards
-     * @param   string $method  e.g. GET/POST
-     * @param   array  $query   The query parameters to include.
+     * @param string $graph  e.g. loans/cards
+     * @param string $method e.g. GET/POST
+     * @param array  $query  the query parameters to include
      *
-     * @return  array           
-     * @throws  \Veloxia\Data\Exceptions\APIRequestException
+     * @return array
+     *
+     * @throws \Veloxia\Data\Exceptions\APIRequestException
      */
     public function makeApiRequest($graph, $method, array $query = [])
     {
-
-        $query[] = 'token=' . $this->getConfig('token');
+        $query[] = 'token='.$this->getConfig('token');
         $queryString = implode('&', $query);
         $endpoint = $this->getConfig('endpoint');
-        $endpointFile = __DIR__ . '/../' . $endpoint;
+        $endpointFile = __DIR__.'/../'.$endpoint;
 
-        # if endpoint does not exist as a file, assume it's a url
+        // if endpoint does not exist as a file, assume it's a url
         if (!file_exists($endpointFile)) {
             $endpoint = "${endpoint}/${graph}/${method}?${queryString}";
         }
@@ -137,9 +127,8 @@ class Client
             throw new APIException('The API returned invalid JSON.', $e);
         }
 
-
         if ($response['success'] !== true) {
-            throw new APIException('Could not make API request. Message: ' . $response['message']);
+            throw new APIException('Could not make API request. Message: '.$response['message']);
         }
 
         return $response['data'];
@@ -147,12 +136,12 @@ class Client
 
     protected function getFromCache($graph)
     {
-
         $output = null;
         foreach ($this->getConfig('cache_methods') as $method) {
             $data = $method::get($graph);
             $output = $data !== null ? $data : $output;
         }
+
         return $output;
     }
 

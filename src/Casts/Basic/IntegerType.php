@@ -10,11 +10,13 @@ use Veloxia\Data\Contracts\TypeContract;
  */
 class IntegerType extends Type implements TypeContract
 {
-
     protected $value;
 
+    /**
+     * @param mixed $input
+     */
     public function format($input): int
     {
-        return (int) $input;
+        return (int) bye('[^0-9]', '', is_float($input) ? round($input) : $input);
     }
 }

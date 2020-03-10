@@ -6,13 +6,12 @@ use Veloxia\Data\Contracts\TypeContract;
 
 abstract class Type implements TypeContract
 {
-
     /**
      * Instanciate the type, optionally with data.
      *
-     * @param   mixed   $value 
+     * @param mixed $value
      *
-     * @return  void
+     * @return void
      */
     public function __construct($value = null)
     {
@@ -24,8 +23,6 @@ abstract class Type implements TypeContract
     /**
      * Import a serialized chunk of data and turn it into a "type".
      *
-     * @param string $serialized
-     *
      * @return self
      */
     public static function import(string $serialized): TypeContract
@@ -35,8 +32,6 @@ abstract class Type implements TypeContract
 
     /**
      * Convert this graph model value into a serialized string. By default, `serialize()` is called on the `$this->value` attribute.
-     *
-     * @return  string 
      */
     public function export(): string
     {
@@ -52,11 +47,11 @@ abstract class Type implements TypeContract
     {
         return method_exists($this, 'pretty')
             ? $this->pretty()
-            : (string) $this->value;
+            : (string) $this->get();
     }
 
     /**
-     * Get the raw value of this attribute "as is". 
+     * Get the raw value of this attribute "as is".
      *
      * @return mixed|null
      */

@@ -8,11 +8,24 @@ use Veloxia\Data\Contracts\GraphContract;
 class {{ name }} extends Graph implements GraphContract
 {
     /**
-     * Graph accessor when making requests to the API. 
-     * 
+     * Graph accessor when making requests to the API.
+     *
      * @var string
      */
     protected static $graphName = '{{graph|raw}}';
+
+    /**
+     * Find a specific {{ name|lower }}.
+     *
+     * @param string $slug
+     *
+     * @return \{{ namespace|raw }}\{{ name }}
+     */
+    public static function find(string $slug): self
+    {
+        return parent::find($slug);
+    }
+
 {% for method in methods %}
 
     /**

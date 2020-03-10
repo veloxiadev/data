@@ -6,15 +6,14 @@ use Veloxia\Data\Casts\Type;
 use Veloxia\Data\Contracts\TypeContract;
 
 /**
- * A (float) number. And a few decimals.
+ * A (float)ing point number. And a few decimals.
  */
 class FloatType extends Type implements TypeContract
 {
-
     protected $value;
 
     public function format($input): float
     {
-        return (float) $input;
+        return round((float) $input, 2);
     }
 }

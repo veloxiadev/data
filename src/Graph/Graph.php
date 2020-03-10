@@ -2,13 +2,10 @@
 
 namespace Veloxia\Data\Graph;
 
-use Veloxia\Data\Client;
 use Veloxia\Data\Contracts\GraphContract;
-use Veloxia\Data\Contracts\TypeContract;
 
 abstract class Graph implements GraphContract
 {
-
     /**
      * The attributes of this graph model.
      *
@@ -19,25 +16,20 @@ abstract class Graph implements GraphContract
     /**
      * Find a model within this graph.
      *
-     * @param string $slug  The slug URL associated with the wanted model.
-     *
-     * @return \Veloxia\Data\Contracts\GraphContract
+     * @param string $slug The slug URL associated with the wanted model
      */
-    public static function find(string $slug): GraphContract
+    public static function find(string $slug): self
     {
-
-        # Bind this graph model in the container. 
-        app()->singleton(static::$graphName . '.' . $slug, function () use ($slug) {
+        // Bind this graph model in the container.
+        app()->singleton(static::$graphName.'.'.$slug, function () use ($slug) {
             return new static(app('data')->find(static::$graphName, $slug));
         });
 
-        return app(static::$graphName . '.' . $slug);
+        return app(static::$graphName.'.'.$slug);
     }
 
     /**
      * Create a new model instance.
-     *
-     * @param array $attributes
      */
     public function __construct(array $attributes = [])
     {
@@ -49,24 +41,24 @@ abstract class Graph implements GraphContract
     /**
      * Get the value of an attribute.
      *
-     * @param string $attribute
-     *
      * @return mixed
      */
     public function get(string $attribute)
     {
-        return $this->attributes[$attribute];
+        return $this->attributes[$attribute]
+                    ?? $this->$attribute()
+                    ?? null;
     }
 
     /**
      * Set the value of an attribute.
      *
-     * @param string $attribute
+     * @param string $attribute Attribute label
      * @param \Veloxia\Data\Casts\TypeContract
      *
      * @return mixed
      */
-    public function set(string $attribute, TypeContract $type)
+    public function set(string $attribute, $type)
     {
         return $this->attributes[$attribute] = $type;
     }
@@ -74,36 +66,29 @@ abstract class Graph implements GraphContract
     /**
      * Magic method to steer direct referencing to the correct "pseudo variable".
      *
-     * @param   string  $attribute
-     *
-     * @return  mixed
+     * @return mixed
      */
     public function __get(string $attribute)
     {
-        if (!isset($this->$attribute)) {
+        if (!isset($this->$attribute) && array_key_exists($attribute, $this->attributes)) {
             return $this->attributes[$attribute]->get();
         }
     }
 
     /**
      * Turn this graph model into an array of serialized type objects.
-     *
-     * @return  array
      */
     public function export(): array
     {
         array_walk($this->attributes, function (&$item) {
             $item = json_encode([get_class($item), $item->export()]);
         });
+
         return $this->attributes;
     }
 
     /**
      * Import an array of attributes and turn it into a graph model.
-     *
-     * @param array   $values
-     *
-     * @return \Veloxia\Data\Contracts\GraphContract
      */
     public static function import(array $values): GraphContract
     {
@@ -112,13 +97,12 @@ abstract class Graph implements GraphContract
             $value = json_decode($value);
             $graph->set($attribute, $value[0]::import($value[1]));
         }
+
         return $graph;
     }
 
     /**
      * Get all attributes as an associative array.
-     *
-     * @return  array
      */
     public function toArray(): array
     {
@@ -129,8 +113,6 @@ abstract class Graph implements GraphContract
 
     /**
      * Get all attributes as JSON.
-     *
-     * @return  string 
      */
     public function toJson(): string
     {
@@ -143,7 +125,7 @@ abstract class Graph implements GraphContract
     /**
      * Convert the entire graph model to JSON.
      *
-     * @return  string  JSON
+     * @return string JSON
      */
     public function __toString()
     {
