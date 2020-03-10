@@ -1,11 +1,7 @@
 {
     "name": "veloxia/data",
     "description": "The best Veloxiadata.",
-    "keywords": [
-        "veloxia",
-        "data",
-        "vd"
-    ],
+    "keywords": ["veloxia", "data", "vd"],
     "homepage": "https://github.com/veloxiadev/data",
     "license": "MIT",
     "type": "library",
@@ -19,7 +15,7 @@
     "require": {
         "php": "^7.1",
         "illuminate/support": "^5.2|^6.0|^7.0",
-        "veloxia/php-helpers": "^1.1"
+        "veloxia/php-helpers": "^1.2"
     },
     "require-dev": {
         "orchestra/testbench": "^4.0",
@@ -46,9 +42,7 @@
     },
     "extra": {
         "laravel": {
-            "providers": [
-                "Veloxia\\Data\\DataServiceProvider"
-            ],
+            "providers": ["Veloxia\\Data\\DataServiceProvider"],
             "aliases": {
                 "VD": "Veloxia\\Data\\Facades\\VD"
             }
